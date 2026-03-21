@@ -1,0 +1,28 @@
+{
+  "name": "HRL Community – Professional Hub",
+  "short_name": "HRL Community",
+  "description": "Collaborate, network and grow within the HardbanRecords Lab professional community.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "categories": ["social", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
