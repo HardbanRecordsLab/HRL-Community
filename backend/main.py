@@ -21,6 +21,20 @@ app.add_middleware(
 async def health():
     return {"status": "healthy", "service": "community", "arch": "Unified HRL"}
 
+@app.get("/api/auth")
+async def get_auth_profile(email: str):
+    """
+    Standardowy endpoint autoryzacji - Proxy do profilu użytkownika.
+    """
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.get(f"{ACCESS_MANAGER_URL}/api/auth/profile", params={"email": email})
+            if resp.status_code != 200:
+                raise HTTPException(status_code=resp.status_code, detail="Auth Service Error")
+            return resp.json()
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=f"Access Manager Connection Error: {str(e)}")
+
 @app.post("/api/posts/create")
 async def create_post(data: dict, authorization: str = Header(None)):
     email = data.get("email")
