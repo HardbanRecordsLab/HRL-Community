@@ -18,6 +18,13 @@ export interface User {
   projects: string[];
   photos: string[];
   profileComplete: boolean;
+  age?: number;
+  gender?: string;
+  orientation?: string;
+  coinBalance?: number;
+  moodStatus?: string;
+  interests?: string[];
+  relationshipType?: string;
 }
 
 export interface Profile {
