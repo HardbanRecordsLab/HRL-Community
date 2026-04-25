@@ -7,7 +7,7 @@ import time
 
 app = FastAPI(title="HRL Community API", version="1.0.0")
 
-ACCESS_MANAGER_URL = os.getenv("ACCESS_MANAGER_URL", "http://hrl-webhook-hub-backend:9107")
+ACCESS_MANAGER_URL = os.getenv("ACCESS_MANAGER_URL", "http://localhost:9107")
 
 app.add_middleware(
     CORSMiddleware,
