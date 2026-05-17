@@ -1,6 +1,24 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import type { User, Session } from '@supabase/supabase-js';
+
+const LOCAL_TOKEN = 'hrl-local-app-token';
+const LOCAL_USER: User = {
+  id: 'local-community-user',
+  email: 'local@hardbanrecordslab.online',
+  name: 'Local Community User',
+  role: 'admin',
+};
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string;
+}
+
+export interface Session {
+  user: User | null;
+  token?: string;
+}
 
 export interface AuthState {
   user: User | null;
@@ -8,62 +26,55 @@ export interface AuthState {
   loading: boolean;
 }
 
+function enableLocalSession() {
+  localStorage.setItem('hrl_local_app_auth', LOCAL_TOKEN);
+  localStorage.removeItem('hrl_jwt_token');
+  document.cookie = 'jwt_token=; Max-Age=0; path=/;';
+  document.cookie = 'jwt_token=; Max-Age=0; path=/; domain=.hardbanrecordslab.online;';
+}
+
 export function useAuth() {
   const [state, setState] = useState<AuthState>({
-    user: null,
-    session: null,
+    user: LOCAL_USER,
+    session: { user: LOCAL_USER, token: LOCAL_TOKEN },
     loading: true,
   });
 
   useEffect(() => {
-    // Set up auth listener BEFORE getting session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setState({ user: session?.user ?? null, session, loading: false });
-    });
-
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setState({ user: session?.user ?? null, session, loading: false });
-    });
-
-    return () => subscription.unsubscribe();
+    enableLocalSession();
+    setState({ user: LOCAL_USER, session: { user: LOCAL_USER, token: LOCAL_TOKEN }, loading: false });
   }, []);
 
   return state;
 }
 
-export async function signUpWithEmail(email: string, password: string) {
-  return supabase.auth.signUp({
-    email,
-    password,
-    options: { emailRedirectTo: window.location.origin },
-  });
-}
-
-export async function signInWithEmail(email: string, password: string) {
-  return supabase.auth.signInWithPassword({ email, password });
-}
-
-export async function signInWithGoogle() {
-  return supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin },
-  });
-}
-
-export async function signInWithApple() {
-  return supabase.auth.signInWithOAuth({
-    provider: 'apple',
-    options: { redirectTo: window.location.origin },
-  });
+export function redirectToLogin() {
+  enableLocalSession();
 }
 
 export async function signOut() {
-  return supabase.auth.signOut();
+  enableLocalSession();
+  return { error: null };
 }
 
-export async function resetPassword(email: string) {
-  return supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/reset-password`,
-  });
+export async function signUpWithEmail(_email: string, _password: string) {
+  enableLocalSession();
+  return { data: { user: LOCAL_USER, session: { user: LOCAL_USER, token: LOCAL_TOKEN } }, error: null };
+}
+
+export async function signInWithEmail(_email: string, _password: string) {
+  enableLocalSession();
+  return { data: { user: LOCAL_USER, session: { user: LOCAL_USER, token: LOCAL_TOKEN } }, error: null };
+}
+
+export async function signInWithGoogle() {
+  return { data: null, error: { message: 'Google login is disabled for this app.' } };
+}
+
+export async function signInWithApple() {
+  return { data: null, error: { message: 'Apple login is disabled for this app.' } };
+}
+
+export async function resetPassword(_email: string) {
+  return { data: null, error: null };
 }
